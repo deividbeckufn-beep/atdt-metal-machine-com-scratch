@@ -1,0 +1,23 @@
+ATDT SYNTH MACHINE - instalado!
+================================
+
+O plugin VST3 foi instalado em:
+  C:\Program Files\Common Files\VST3\ATDT SYNTH MACHINE.vst3
+
+COMO ABRIR NO REAPER
+  1. Abra o REAPER.
+  2. Options > Preferences > Plug-ins > VST
+  3. Clique em "Re-scan" (ou "Clear cache/re-scan"). Clique em OK.
+  4. Track > Insert virtual instrument on new track...
+  5. Procure "ATDT SYNTH MACHINE" (em VST3i) e confirme.
+
+TECLADO MIDI
+  1. Options > Preferences > Audio > MIDI Inputs: habilite o seu teclado.
+  2. Na trilha: ligue o Record arm (botao vermelho) e o Record monitoring.
+  3. Clique direito no Record arm > Input: MIDI > All MIDI inputs > All channels.
+
+SEUS PRESETS
+  Ficam em Documentos\ATDT Synth Machine\Presets
+  (desinstalar o plugin NAO apaga essa pasta).
+
+Mais detalhes: README.md (nesta mesma pasta).
