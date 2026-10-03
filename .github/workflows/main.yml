@@ -1,0 +1,53 @@
+name: Build Windows (instalador)
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Baixar o codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar (baixa o JUCE automaticamente)
+        run: cmake -B build -A x64 -DMM_BUILD_TESTS=ON
+
+      - name: Compilar VST3 + Standalone + teste
+        run: cmake --build build --config Release --parallel --target MetalMachine_VST3 MetalMachine_Standalone PluginTest
+
+      - name: Testar no Windows
+        shell: pwsh
+        run: |
+          & "build/PluginTest_artefacts/Release/PluginTest.exe" "build/MetalMachine_artefacts/Release/VST3/ATDT METAL MACHINE.vst3"
+          if ($LASTEXITCODE -ne 0) { Write-Error "Teste falhou"; exit 1 }
+
+      - name: Gerar instalador (Inno Setup)
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (!(Test-Path $iscc)) {
+            choco install innosetup -y --no-progress
+            $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          }
+          & $iscc "installer\ATDT_Metal_Machine.iss"
+          if ($LASTEXITCODE -ne 0) { Write-Error "Inno Setup falhou"; exit 1 }
+
+      - name: Montar pacote de download
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item "installer\Output\*.exe" dist\
+          Copy-Item -Recurse "build\MetalMachine_artefacts\Release\VST3\ATDT METAL MACHINE.vst3" "dist\ATDT METAL MACHINE.vst3"
+          Copy-Item "build\MetalMachine_artefacts\Release\Standalone\ATDT METAL MACHINE.exe" dist\
+          Copy-Item LEIA-ME-INSTALACAO.txt dist\
+
+      - name: Disponibilizar para download
+        uses: actions/upload-artifact@v4
+        with:
+          name: ATDT-METAL-MACHINE-Windows
+          path: dist/
+          retention-days: 90
